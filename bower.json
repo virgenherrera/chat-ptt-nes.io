@@ -1,0 +1,24 @@
+{
+  "name": "reqlogger",
+  "description": "",
+  "main": "",
+  "authors": [
+    "Hugo Virgen <virgenherrera@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/virgenherrera/chat-ptt-nes.io#readme",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "sweetalert": "1.1.3",
+    "bootstrap": "3.3.7",
+    "jquery": "3.2.1",
+    "socket.io-client": "1.7.2"
+  }
+}

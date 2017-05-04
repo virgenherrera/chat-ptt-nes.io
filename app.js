@@ -1,6 +1,5 @@
 "use strict";
 
-const express 		= sys.require('express');
 const favicon 		= sys.require('serve-favicon');
 const logger 		= sys.require('morgan');
 // const cookieParser	= sys.require('cookie-parser');
@@ -11,7 +10,7 @@ const users 		= sys.require('/routes/users');
 // Create and config a new ExpressJs web Application
 var Application = (function(){
 	function Application(){
-		this.express = express();
+		this.express = sys.express();
 
 		return this.constructor();
 	}
@@ -39,7 +38,7 @@ var Application = (function(){
 	};
 
 	Application.prototype.exposePubicPath = function(){
-		this.express.use(express.static( sys.dir.public ));
+		this.express.use( sys.express.static( sys.dir.public ) );
 	};
 
 	Application.prototype.loadRoutes = function(){

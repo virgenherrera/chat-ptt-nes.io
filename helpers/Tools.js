@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const express = require('express');
 const fs = require('fs');
 
 var Tools = (function(){
@@ -26,6 +27,7 @@ var Tools = (function(){
 	}
 
 	Tools.prototype.path = path;
+	Tools.prototype.express = express;
 
 	Tools.prototype.require = function(Module){
 		if( Module && typeof Module === 'string' ){

@@ -1,9 +1,28 @@
-var express = require('express');
-var router = express.Router();
+"use strict";
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+/* Index Router Class */
+const indexRouter = (function(){
+	function indexRouter(){
+		// Router to Expose
+		this.router = sys.express.Router();
 
-module.exports = router;
+		return this.constructor();
+	}
+
+	indexRouter.prototype.constructor = function(){
+		this.router.get('/',this.rootGet);
+	};
+
+	/* GET home page. */
+	indexRouter.prototype.rootGet = function(req,res,next){
+		let data = {
+			title: sys.env.name,
+		};
+
+		return res.render( 'index' , data );
+	};
+
+	return indexRouter;
+})();
+
+module.exports = new indexRouter().router;

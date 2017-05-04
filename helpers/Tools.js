@@ -8,113 +8,92 @@ var Tools = (function(){
 		// declare parent directory as basePath
 		process.chdir( path.join( __dirname , '../' ) );
 
-		// property to expose
-		this.tools = {
-			dir: { base: process.cwd() },
-			path: path,
+		const baseDir = process.cwd();
+
+		//project directories list
+		this.dir = {
+			base: 			baseDir,
+			config: 		this.path.join( baseDir , "/config" ),
+			models: 		this.path.join( baseDir , "/models" ),
+			routes: 		this.path.join( baseDir , "/routes" ),
+			public: 		this.path.join( baseDir , "/public" ),
+			views: 			this.path.join( baseDir , "/views" ),
+			controllers: 	this.path.join( baseDir , "/controllers" ),
 		};
 
-		return this.constructor();
+		// Environment vars
+		this.env = this.require('/config/env');
 	}
 
-	Tools.prototype.constructor = function(){
+	Tools.prototype.path = path;
 
+	Tools.prototype.require = function(Module){
+		if( Module && typeof Module === 'string' ){
+			let	modOrOPack		= ( Module.charAt(0) === "/" );
+			let	requireString	= modOrOPack ? this.path.join( this.dir.base , Module ) : Module;
 
-		// load paths, environment , debugtools
-		this.declarePaths().getEnv().getDbConfig().exposeDD().exposeFileExists();
+			return require( requireString );
 
-		// push loadSystemModule to tools
-		this.tools.require = this.loadSystemModule;
-
-		// expose tools to global Scope
-		global.sys = this.tools;
-	};
-
-	Tools.prototype.loadSystemModule = function(projModule){
-		if( projModule.charAt(0) !== "/" ) throw "Module must begin with '/'";
-
-		let pathToModule = path.join( process.cwd() , projModule );
-
-		return require( pathToModule );
-	};
-
-	Tools.prototype.getEnv = function(){
-		// get the env
-		const env = this.loadSystemModule('/config/env');
-		// push it to tools
-		this.tools.env = env;
-
-		return this;
+		} else {
+			console.error('error trying to load module, module must be a STRING and you used:');
+			this.dd( Module );
+		}
 	};
 
 	Tools.prototype.getDbConfig = function(){
 		// get the database config
-		const dbCfg = this.loadSystemModule('/config/db');
-		// push it to tools as a function
-		this.tools.getDbConfig = ()=>dbCfg[ this.tools.env.env ];
+		const dbCfg = this.require('/config/db');
 
-		return this;
+		// return db config accordint ot env
+		return dbCfg[ this.env.env ];
 	};
 
-	Tools.prototype.declarePaths = function(){
-		const systemPaths = [
-		'views',
-		'public',
-		'routes',
-		'models',
-		'config',
-		'controllers',
-		];
+	Tools.prototype.fileExists = function(pathTofile){
+		return ( fs.existsSync( pathTofile ) );
+	};
 
+	Tools.prototype.fileExistsRel = function(filePath){
+		return this.fileExists( this.dir.base + filePath );
+	};
 
-		// declare additional paths
-		for (var i = systemPaths.length - 1; i >= 0; i--) {
-			// systemPaths[i]
-			this.tools.dir[ systemPaths[i] ] = path.join( this.tools.dir.base , systemPaths[i] );
-		}
-
-		return this;
+	Tools.prototype.getProjectUrl = function(){
+		return this.env.host + ":" + this.env.port;
 	};
 
 	Tools.prototype.dump = function(){
-		console.log('\x1Bc');
-		console.log(`\n\t\tstart Data dumping...\n`);
-		for ( let data in arguments ){
-			// statement
-			if( typeof arguments[data] === "string" || /^\d+$/.test( arguments[data] ) ){
-				console.log( arguments[ data ] );
-			} else {
-				console.dir( arguments[ data ] );
-			}
+		console.log("\n//*------- start Data dumping...\n");
+		for ( var arg in arguments ){
+		    // Notify about which arg are dumping
+		    console.info('\n\n\t...for argument:{'+arg+"}\n");
+		    //print type
+		    console.log( 'Type: ', typeof arguments[arg] );
+		    // print length if exists
+		    if( arguments[arg] && arguments[arg].length ){
+		        console.log( 'Legth: ', arguments[arg].length );
+		    }
+		    // print Value
+		    if( typeof arguments[arg] === "string" || /^\d+$/.test( arguments[arg] ) ){
+		        console.log( 'Value: ', arguments[ arg ] );
+		    } else {
+		        console.log( 'Value: ');
+		        console.dir( arguments[ arg ] );
+		    }
 		}
-		console.log(`\n\t\t...data dump done!\n`);
+		console.log("\n\t\tData dump done! -------*//\n");
 	};
 
 	Tools.prototype.die = function(){
-		console.info(`now Process will die`);
+		console.trace();
+		console.info("\n\n\nnow Process will die\n\n");
 		process.exit();
 	};
 
-	Tools.prototype.dumpAndDie = function(){
+	Tools.prototype.dd = function(){
 		this.dump.apply( this, arguments );
 		this.die();
-	};
-
-	Tools.prototype.exposeDD = function(){
-		if( this.tools.env.env === 'development' ){
-			this.tools.dump = this.dump;
-			this.tools.die = this.die;
-			this.tools.dd = this.dumpAndDie;
-		}
-		return this;
-	};
-
-	Tools.prototype.exposeFileExists = function(){
-		this.tools.fileExists = (pathTofile)=>{ ( fs.existsSync( pathTofile ) ) };
-		return this;
 	};
 
 	return Tools;
 })();
 
-module.exports = new Tools();
+global.sys = new Tools();

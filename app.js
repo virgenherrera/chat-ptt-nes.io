@@ -1,16 +1,13 @@
 'use strict';
-const express = require('express');
-const favicon = require('serve-favicon');
-const logger = require('morgan');
+const express = sys.require('express');
+const favicon = sys.require('serve-favicon');
+const logger = sys.require('morgan');
 // const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-
+const bodyParser = sys.require('body-parser');
 const index = sys.require('/routes/index');
 const users = sys.require('/routes/users');
 
 const app = express();
-
-sys.require('/models');
 
 // view engine setup
 app.set('views', sys.dir.views);

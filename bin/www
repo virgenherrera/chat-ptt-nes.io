@@ -6,14 +6,14 @@
 require('../helpers/Tools');
 
 const app = sys.require('/app');
-const debug = require('debug')('chat-ptt-nes.io:server');
-const http = require('http');
+const http = sys.require('http');
+const debug = sys.require('debug')('chat-ptt-nes.io:server');
 
 /**
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || sys.env.port);
+const port = normalizePort( process.env.PORT || sys.env.port );
 app.set('port', port);
 
 /**
@@ -85,8 +85,9 @@ function onError(error) {
 function onListening() {
   const addr = server.address();
   const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-  const msg  = `Listening on ${bind}`;
+  const msg  = `${sys.env.name} is Listening on port: ${bind}`;
 
   debug(msg);
   console.log(msg);
+  console.log("check it at:",sys.getProjectUrl());
 }

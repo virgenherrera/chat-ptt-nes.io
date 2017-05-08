@@ -1,10 +1,11 @@
 'use strict';
 
-const path = require('path');
-const express = require('express');
-const fs = require('fs');
+const path 		= require('path');
+const express 	= require('express');
+const fs 		= require('fs');
+const socketIo 	= require('socket.io');
 
-var Tools = (function(){
+const Tools = (function(){
 	function Tools(){
 		// declare parent directory as basePath
 		process.chdir( path.join( __dirname , '../' ) );
@@ -25,9 +26,6 @@ var Tools = (function(){
 		// Environment vars
 		this.env = this.require('/config/env');
 	}
-
-	Tools.prototype.path = path;
-	Tools.prototype.express = express;
 
 	Tools.prototype.require = function(Module){
 		if( Module && typeof Module === 'string' ){
@@ -94,6 +92,17 @@ var Tools = (function(){
 		this.dump.apply( this, arguments );
 		this.die();
 	};
+
+	/**
+	 *	Additional tools to avoid require inception
+	 */
+
+	// path for directory jobs
+	Tools.prototype.path = path;
+	// express for use it in app and routers
+	Tools.prototype.express = express;
+	// socket.io for realtime I/O between this service and clients
+	Tools.prototype.io = socketIo;
 
 	return Tools;
 })();

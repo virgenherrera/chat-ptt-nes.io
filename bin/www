@@ -23,6 +23,21 @@ app.set('port', port);
 const server = http.createServer(app);
 
 /**
+ * Inject socket.io functions in server
+ */
+sys.io = sys.io( server );
+
+/**
+ * Declare/Handle Socket.io events!
+ */
+sys.io.on('connection',function(socket){
+	socket.on('msg',function(msg){
+		sys.io.emit('msg',msg);
+	});
+});
+
+
+/**
  * Listen on provided port, on all network interfaces.
  */
 

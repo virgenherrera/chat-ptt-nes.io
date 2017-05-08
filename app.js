@@ -8,7 +8,7 @@ const index 		= sys.require('/routes/index');
 const users 		= sys.require('/routes/users');
 
 // Create and config a new ExpressJs web Application
-var Application = (function(){
+const Application = (function(){
 	function Application(){
 		this.express = sys.express();
 

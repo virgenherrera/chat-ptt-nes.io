@@ -1,10 +1,11 @@
 'use strict';
 
-const path = require('path');
-const express = require('express');
-const fs = require('fs');
+const path 		= require('path');
+const express 	= require('express');
+const fs 		= require('fs');
+const SocketIo	= require('socket.io');
 
-var Tools = (function(){
+const Tools = (function(){
 	function Tools(){
 		// declare parent directory as basePath
 		process.chdir( path.join( __dirname , '../' ) );
@@ -14,21 +15,21 @@ var Tools = (function(){
 		//project directories list
 		this.dir = {
 			base: 			baseDir,
-			config: 		this.path.join( baseDir , "/config" ),
-			models: 		this.path.join( baseDir , "/models" ),
-			routes: 		this.path.join( baseDir , "/routes" ),
-			public: 		this.path.join( baseDir , "/public" ),
-			views: 			this.path.join( baseDir , "/views" ),
-			controllers: 	this.path.join( baseDir , "/controllers" ),
+			config: 		baseDir + "/config",
+			models: 		baseDir + "/models",
+			routes: 		baseDir + "/routes",
+			public: 		baseDir + "/public",
+			views: 			baseDir + "/views",
+			controllers: 	baseDir + "/controllers",
 		};
 
 		// Environment vars
-		this.env = this.require('/config/env');
+		this.env = this.getConfig('/env');
 	}
 
-	Tools.prototype.path = path;
-	Tools.prototype.express = express;
-
+	/*
+	 * System Loaders
+	 */
 	Tools.prototype.require = function(Module){
 		if( Module && typeof Module === 'string' ){
 			let	modOrOPack		= ( Module.charAt(0) === "/" );
@@ -42,9 +43,17 @@ var Tools = (function(){
 		}
 	};
 
+	// Config Loader
+	Tools.prototype.getConfig = function(configFile){
+		const configFilePath = this.path.join( this.dir.config + configFile );
+
+		return this.require( configFilePath );
+	};
+
+	// Databse Config for Environment
 	Tools.prototype.getDbConfig = function(){
 		// get the database config
-		const dbCfg = this.require('/config/db');
+		const dbCfg = this.getConfig('/db');
 
 		// return db config accordint ot env
 		return dbCfg[ this.env.env ];
@@ -94,6 +103,16 @@ var Tools = (function(){
 		this.dump.apply( this, arguments );
 		this.die();
 	};
+
+	/**
+	 *	Additional Tools to prevent require Inception
+	 * 	path for directory tasks
+	 *	Express for use it in app and routers
+	 *	Socket.io for realtime I/O
+	 */
+	Tools.prototype.path = path;
+	Tools.prototype.express = express;
+	Tools.prototype.io = SocketIo
 
 	return Tools;
 })();
